@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Guardian Mission</title>
+<meta name="description" content="Cyber Guardian Mission – cyber awareness lesson for Grade 7 with simulations, scenarios and a Cyber Defender badge.">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090e1d;--panel:#111a33;--panel2:#18244a;--line:#2b3a6e;
+  --ink:#eef2ff;--muted:#a3b0d6;--acc:#8b5cf6;--acc2:#22d3ee;--yellow:#facc15;
+  --red:#fb7185;--green:#4ade80;--orange:#fb923c;--radius:16px;
+  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:
+    linear-gradient(rgba(139,92,246,.05) 1px,transparent 1px) 0 0/32px 32px,
+    linear-gradient(90deg,rgba(139,92,246,.05) 1px,transparent 1px) 0 0/32px 32px,
+    radial-gradient(circle at 80% 0%,#2a1a5e 0,transparent 45%),
+    radial-gradient(circle at 0% 100%,#0e3350 0,transparent 45%),var(--bg);
+  color:var(--ink);font-family:'Space Grotesk',system-ui,-apple-system,Segoe UI,sans-serif;
+  font-size:18px;line-height:1.5;min-height:100vh;
+}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+code,.mono{font-family:var(--mono)}
+header{position:sticky;top:0;z-index:20;background:rgba(9,14,29,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.topbar{max-width:1120px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.2rem}
+.brand .lvl{font-family:var(--mono);font-size:.75rem;background:var(--acc);color:#fff;padding:2px 8px;border-radius:6px}
+.points{background:linear-gradient(90deg,var(--acc),var(--acc2));color:#fff;font-weight:700;padding:6px 14px;border-radius:999px;white-space:nowrap;font-family:var(--mono);font-size:.95rem}
+.points.bump{animation:bump .4s}
+@keyframes bump{50%{transform:scale(1.2)}}
+nav{max-width:1120px;margin:0 auto;padding:0 16px 10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;background:var(--panel);color:var(--muted);border:1px solid var(--line);padding:6px 14px;border-radius:10px;font-size:.9rem}
+nav button.active{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:600}
+nav button.done:not(.active){color:var(--green);border-color:var(--green)}
+.progress{height:4px;background:var(--panel)}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .4s}
+
+main{max-width:1120px;margin:0 auto;padding:20px 16px 110px}
+.screen{display:none;animation:fade .35s}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(1.8rem,5vw,2.8rem);margin:.2em 0;line-height:1.15}
+h2{font-size:clamp(1.45rem,4vw,2rem);margin:.2em 0 .3em}
+h3{margin:.2em 0}
+.lead{color:var(--muted);font-size:1.08rem;margin-top:0}
+.tag{display:inline-block;font-family:var(--mono);background:rgba(139,92,246,.15);color:var(--acc2);border:1px solid var(--line);padding:3px 10px;border-radius:6px;font-size:.8rem;letter-spacing:1px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin:16px 0}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.btn{background:var(--acc);color:#fff;border:none;padding:12px 20px;border-radius:12px;font-weight:600}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.cyan{background:var(--acc2);color:#052a33}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.feedback{margin-top:14px;padding:16px;border-radius:14px;display:none;animation:fade .3s}
+.feedback.show{display:block}
+.feedback.best{background:rgba(74,222,128,.12);border:1px solid var(--green)}
+.feedback.okay{background:rgba(251,146,60,.12);border:1px solid var(--orange)}
+.feedback.bad{background:rgba(251,113,133,.12);border:1px solid var(--red)}
+.result{text-align:center}
+.result .big{font-size:4rem}
+.counter{font-size:1.1rem;font-weight:700;color:var(--yellow);font-family:var(--mono)}
+.note{background:rgba(34,211,238,.08);border:1px solid var(--acc2);border-radius:12px;padding:12px 14px;font-size:.98rem}
+.warn{background:rgba(251,113,133,.1);border:1px solid var(--red);border-radius:12px;padding:12px 14px;font-size:.98rem}
+
+/* Briefing */
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:center}
+.terminal{background:#050913;border:1px solid var(--line);border-radius:14px;padding:16px;font-family:var(--mono);font-size:.9rem;color:var(--green);min-height:200px;white-space:pre-wrap}
+.terminal .c{color:var(--acc2)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{background:var(--panel2);border-radius:14px;padding:14px;border-left:5px solid var(--acc)}
+.stat b{display:block;font-size:1.1rem;color:var(--yellow)}
+.trig{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
+.trig button{background:var(--panel2);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:12px 8px;font-weight:600}
+.trig button span{display:block;font-size:1.8rem}
+.trig button.right{border-color:var(--green);background:rgba(74,222,128,.15)}
+.trig button.wrong{border-color:var(--red);background:rgba(251,113,133,.15)}
+.msgcard{background:#f5f7fb;color:#18202f;border-radius:14px;padding:18px;font-size:1.15rem;border-left:6px solid var(--acc)}
+.msgcard small{display:block;color:#667;font-size:.85rem;margin-bottom:4px}
+
+/* Threat cards */
+.tcard{background:var(--panel2);border:2px solid var(--line);border-radius:var(--radius);padding:18px;min-height:210px;text-align:left;color:var(--ink);transition:transform .2s,border-color .2s;width:100%}
+.tcard:hover{transform:translateY(-3px);border-color:var(--acc2)}
+.tcard .ico{font-size:2.4rem}
+.tcard .front h3{font-size:1.25rem}
+.tcard .front p{color:var(--muted);margin:.3em 0 0}
+.tcard .lvlpill{font-family:var(--mono);font-size:.72rem;padding:2px 8px;border-radius:6px;display:inline-block;margin-top:8px}
+.tcard .back{display:none;font-size:.96rem}
+.tcard.open{border-color:var(--acc);background:#211d4f}
+.tcard.open .front{display:none}
+.tcard.open .back{display:block;animation:fade .3s}
+.back b{color:var(--yellow)}
+.tapme{font-size:.8rem;color:var(--acc2);margin-top:8px;display:block;font-family:var(--mono)}
+
+/* Link detective */
+.urlbox{font-family:var(--mono);font-size:clamp(1rem,3vw,1.35rem);background:#050913;border:2px solid var(--line);border-radius:14px;padding:18px;word-break:break-all;margin:12px 0;display:flex;gap:10px;align-items:center}
+.urlbox .lock{font-size:1.4rem}
+.urlbox mark{background:var(--yellow);color:#111;border-radius:4px;padding:0 3px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.duo button{padding:16px;border-radius:14px;border:none;font-weight:700;font-size:1.1rem}
+.trustbtn{background:var(--green);color:#063}
+.notbtn{background:var(--red);color:#fff}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tri button{padding:14px 8px;border-radius:14px;border:none;font-weight:700}
+.rule{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);border-radius:12px;padding:12px;margin-bottom:8px}
+
+/* Breach simulator */
+.toggles label{display:flex;gap:12px;align-items:center;background:var(--panel2);padding:12px 14px;border-radius:12px;margin-bottom:8px;cursor:pointer;border:2px solid transparent}
+.toggles input{width:22px;height:22px;accent-color:var(--acc)}
+.toggles label:has(input:checked){border-color:var(--acc)}
+.accts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.acct{background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:14px;text-align:center;transition:all .3s}
+.acct .i{font-size:2rem}
+.acct .st{font-family:var(--mono);font-size:.85rem;margin-top:6px;color:var(--muted)}
+.acct.hacked{border-color:var(--red);background:rgba(251,113,133,.15);animation:shake .4s}
+.acct.hacked .st{color:var(--red)}
+.acct.safe{border-color:var(--green);background:rgba(74,222,128,.12)}
+.acct.safe .st{color:var(--green)}
+.acct.leak{border-color:var(--orange)}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.log{background:#050913;border:1px solid var(--line);border-radius:12px;padding:12px;font-family:var(--mono);font-size:.85rem;color:var(--acc2);min-height:90px;margin-top:12px;white-space:pre-wrap}
+
+/* Profile leak hunt */
+.profile{background:#fff;color:#1b2130;border-radius:18px;overflow:hidden;user-select:none}
+.profile .cover{height:70px;background:linear-gradient(90deg,#f472b6,#8b5cf6,#22d3ee)}
+.profile .body{padding:0 18px 18px}
+.profile .av{width:76px;height:76px;border-radius:50%;background:#ffe08a;border:4px solid #fff;margin-top:-38px;display:grid;place-items:center;font-size:2.2rem}
+.profile .un{font-weight:700;font-size:1.15rem;margin-top:4px}
+.profile .meta{color:#555;font-size:.95rem;margin:6px 0}
+.post{background:#f1f3f8;border-radius:12px;padding:10px 12px;margin-top:10px;font-size:.98rem}
+.post .ph{font-size:1.6rem;margin-right:6px}
+.flag{border-radius:5px;padding:0 2px;cursor:pointer;transition:background .2s}
+.flag:hover{background:rgba(139,92,246,.15)}
+.flag.found{background:#facc15;outline:2px solid #fb7185;color:#111}
+.foundlist{list-style:none;padding:0;margin:0}
+.foundlist li{background:var(--panel2);border-left:5px solid var(--red);padding:10px 12px;border-radius:10px;margin-bottom:8px;animation:fade .3s;font-size:.96rem}
+.foundlist li b{color:var(--green)}
+
+/* Quiz */
+.qhead{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:center}
+.qbar{height:8px;background:#050913;border-radius:999px;overflow:hidden;margin:10px 0 16px}
+.qbar div{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .4s}
+.scene{font-size:1.18rem;background:var(--panel2);border-radius:14px;padding:18px;border-left:6px solid var(--acc)}
+.scene .emo{font-size:2.3rem;float:left;margin-right:12px;line-height:1}
+.scene .lbl{display:block;font-family:var(--mono);font-size:.75rem;color:var(--acc2);letter-spacing:1px;margin-bottom:4px}
+.opts{display:grid;gap:10px;margin-top:14px}
+.opt{text-align:left;background:var(--panel2);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.opt:hover:not(:disabled){border-color:var(--acc2)}
+.opt .letter{background:var(--line);border-radius:8px;min-width:32px;height:32px;display:grid;place-items:center;font-weight:700;font-family:var(--mono)}
+.opt.best{border-color:var(--green);background:rgba(74,222,128,.12)}
+.opt.okay{border-color:var(--orange);background:rgba(251,146,60,.12)}
+.opt.bad{border-color:var(--red);background:rgba(251,113,133,.12)}
+.opt:disabled{cursor:default}
+
+/* Fact or fake */
+.headline{background:#f5f7fb;color:#18202f;border-radius:14px;padding:18px;margin:12px 0}
+.headline .src{font-size:.85rem;color:#667;margin-bottom:6px}
+.headline .hl{font-size:1.25rem;font-weight:700}
+.sift{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.sift div{background:var(--panel2);border-radius:12px;padding:14px;border-top:5px solid var(--acc2)}
+.sift b{font-size:1.8rem;color:var(--acc2);font-family:var(--mono);display:block}
+
+/* Pledge */
+.pledge label{display:flex;gap:12px;align-items:flex-start;background:var(--panel2);padding:12px 14px;border-radius:12px;margin-bottom:8px;cursor:pointer;border:2px solid transparent}
+.pledge input{width:22px;height:22px;accent-color:var(--acc);flex:0 0 auto;margin-top:3px}
+.pledge label:has(input:checked){border-color:var(--acc)}
+.namein{width:100%;padding:12px 14px;font-size:1.1rem;border-radius:12px;border:2px solid var(--line);background:#050913;color:var(--ink);font-family:inherit}
+#badge{display:none;margin:20px auto;max-width:580px;text-align:center;background:linear-gradient(145deg,#231a55,#0e1d3e);border:3px solid var(--acc2);border-radius:22px;padding:28px 20px;box-shadow:0 0 50px rgba(139,92,246,.45)}
+#badge.show{display:block;animation:pop .5s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}80%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+#badge .medal{font-size:4.6rem}
+#badge .nm{font-size:2rem;font-weight:700;color:var(--yellow)}
+#badge .rank{font-family:var(--mono);color:var(--acc2);letter-spacing:3px}
+
+.bottomnav{position:fixed;bottom:0;left:0;right:0;background:rgba(9,14,29,.95);border-top:1px solid var(--line);padding:10px 16px;z-index:20}
+.bottomnav .in{max-width:1120px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.stepname{color:var(--muted);font-size:.9rem;text-align:center;font-family:var(--mono)}
+.toast{position:fixed;top:92px;left:50%;transform:translateX(-50%);background:var(--yellow);color:#222;font-weight:700;padding:8px 18px;border-radius:999px;z-index:50;display:none;white-space:nowrap}
+.toast.show{display:block;animation:fade .3s}
+
+@media (max-width:720px){
+  body{font-size:16px}
+  .hero{grid-template-columns:1fr}
+  .brand .txt{font-size:1rem}
+  .tri{grid-template-columns:1fr}
+  .stepname{font-size:.75rem}
+}
+@media print{
+  body *{visibility:hidden}
+  #badge,#badge *{visibility:visible}
+  #badge{position:absolute;left:0;right:0;top:20px;box-shadow:none;background:#fff;color:#000;border-color:#000}
+  #badge .nm,#badge .rank{color:#000}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <div class="brand"><span>🛡️</span><span class="txt">Cyber Guardian Mission</span><span class="lvl">GRADE 7</span></div>
+    <div class="points" id="points">XP 0</div>
+  </div>
+  <nav id="nav"></nav>
+  <div class="progress"><div id="progbar"></div></div>
+</header>
+
+<div class="toast" id="toast"></div>
+
+<main>
+
+<!-- 1. BRIEFING -->
+<section class="screen" id="s-brief" data-name="Briefing">
+  <div class="hero">
+    <div>
+      <span class="tag">MISSION 01 · GRADE 7</span>
+      <h1>Welcome, Cyber Agents! 🕶️</h1>
+      <p class="lead">The internet is part of everyday life: games, chats, videos, learning. But scammers, hackers and fake accounts are online too. Today you train like real cyber defenders: you'll learn how attackers <b>think</b>, read website links like a pro, simulate a data breach, and handle tough situations that happen to teenagers every day.</p>
+      <p>Earn <b style="color:var(--acc2)">XP</b> in every mission and unlock the <b style="color:var(--yellow)">Cyber Defender</b> badge.</p>
+    </div>
+    <div class="terminal" id="term"></div>
+  </div>
+
+  <div class="panel">
+    <h2>📊 Why This Matters for Your Age</h2>
+    <div class="stats">
+      <div class="stat"><b>Ages 12–14</b>This is when most students get their own phone and their first social media and gaming accounts.</div>
+      <div class="stat"><b>People, not computers</b>Most hacks don't break computers. They trick people into handing over passwords and codes.</div>
+      <div class="stat"><b>AI makes fakes easy</b>Fake photos, videos and voices can now be made in minutes, so seeing isn't believing any more.</div>
+      <div class="stat"><b>UAE law</b>In the UAE, cyberbullying, sharing someone's photos without permission and spreading rumours online are crimes.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="tag">TRAINING DRILL</span>
+    <h2>🧠 Hacker Mind Tricks</h2>
+    <p class="lead">Scammers don't hack computers first, they hack <b>feelings</b>. This is called <b>social engineering</b>. Read each message and pick the feeling it is trying to use. (+3 XP each)</p>
+    <div id="trickBox"></div>
+  </div>
+</section>
+
+<!-- 2. THREAT INTEL -->
+<section class="screen" id="s-threats" data-name="Threat Intel">
+  <span class="tag">MISSION 02</span>
+  <h2>📡 Threat Intel Board: 2026 Edition</h2>
+  <p class="lead">These are the threats that target students your age right now. Open each file to learn how it works and how to defend against it. (+2 XP each)</p>
+  <p class="counter" id="tcount"></p>
+  <div class="grid g3" id="threats"></div>
+</section>
+
+<!-- 3. LINK DETECTIVE -->
+<section class="screen" id="s-links" data-name="Link Detective">
+  <span class="tag">MISSION 03</span>
+  <h2>🔗 Link Detective</h2>
+  <p class="lead">Scammers build fake websites that look exactly like the real ones. Your only clue is the <b>link</b> (URL). Learn the pro trick, then decide: trust it or not? (+5 XP each)</p>
+  <div class="grid g2">
+    <div class="panel" style="margin:0">
+      <h3>🕵️ The Pro Trick: Find the REAL Domain</h3>
+      <div class="rule"><span>1️⃣</span><span>Look at the part between <code>https://</code> and the <b>first single /</b></span></div>
+      <div class="rule"><span>2️⃣</span><span>Read that part <b>from RIGHT to LEFT</b>. The last two words are the real owner, e.g. <code>accounts.<mark style="background:var(--yellow);color:#111;border-radius:4px;padding:0 3px">google.com</mark></code></span></div>
+      <div class="rule"><span>3️⃣</span><span>Watch for look-alike letters: <code>0</code> for <code>o</code>, <code>1</code> for <code>l</code>, <code>rn</code> for <code>m</code></span></div>
+      <div class="rule"><span>4️⃣</span><span>🔒 HTTPS only means the connection is private. It does <b>NOT</b> mean the site is honest. Scam sites use HTTPS too.</span></div>
+      <div class="rule"><span>5️⃣</span><span>Short links (<code>bit.ly</code>, <code>tinyurl</code>) hide where they really go, so be careful.</span></div>
+    </div>
+    <div class="panel" style="margin:0" id="linkBox"></div>
+  </div>
+</section>
+
+<!-- 4. BREACH SIMULATOR -->
+<section class="screen" id="s-breach" data-name="Breach Simulator">
+  <span class="tag">MISSION 04</span>
+  <h2>💥 Data Breach Simulator</h2>
+  <p class="lead">Rayan uses the same password, <code>Rayan@2013</code>, for everything. One day a game website gets hacked and its passwords are leaked. Hackers then try that leaked password on every other site. This is called <b>credential stuffing</b>.</p>
+  <div class="grid g2">
+    <div class="panel" style="margin:0">
+      <h3>⚙️ Rayan's security settings</h3>
+      <div class="toggles">
+        <label><input type="checkbox" id="uniq"> 🔑 Use a <b>different</b> password for every account</label>
+        <label><input type="checkbox" id="mfa"> 📲 Turn on <b>2-Step Verification (2FA)</b>: a code is sent to a trusted phone</label>
+      </div>
+      <button class="btn" id="breachBtn" onclick="runBreach()">💥 Launch the breach</button>
+      <p style="color:var(--muted);font-size:.95rem">Run it 3 times: with nothing ticked → with unique passwords → with both ticked. Watch what changes!</p>
+    </div>
+    <div class="panel" style="margin:0">
+      <h3>🖥️ Rayan's accounts</h3>
+      <div class="accts" id="accts"></div>
+      <div class="log" id="blog">&gt; Waiting for attack…</div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>🧠 Defender Notes</h3>
+    <ul>
+      <li><b>Unique passwords</b> stop one leak from opening all your accounts.</li>
+      <li><b>2FA</b> means a stolen password alone is not enough. The hacker also needs the code.</li>
+      <li>Strong passwords are <b>long passphrases</b>, e.g. <code>Sleepy-Camel-Builds-42-Rockets!</code>. Never use your name and birth year.</li>
+      <li>A family-approved <b>password manager</b> can remember all your passwords for you.</li>
+      <li>Never share a 2FA code or OTP. <b>Anyone who asks for it is trying to break into your account.</b></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5. PROFILE LEAK HUNT -->
+<section class="screen" id="s-profile" data-name="Profile Leak Hunt">
+  <span class="tag">MISSION 05</span>
+  <h2>👣 Profile Leak Hunt</h2>
+  <p class="lead">This profile belongs to a made-up Grade 7 student. A stranger could work out a lot about them from it. Tap every detail that leaks private information. (+5 XP each)</p>
+  <div class="grid g2">
+    <div class="profile" id="profile">
+      <div class="cover"></div>
+      <div class="body">
+        <div class="av">😎</div>
+        <div class="un"><span class="flag" data-id="0">@rayan_2013</span> · <span class="flag" data-id="1">🌍 Public account</span></div>
+        <div class="meta"><span class="flag" data-id="2">Grade 7B @ Al Noor Academy 🏫</span> · <span class="flag" data-id="3">📍 Al Nahda, Sharjah</span></div>
+        <div class="meta"><span class="flag" data-id="4">📞 DM or WhatsApp: 050 123 4567</span></div>
+        <div class="post"><span class="ph">🏠</span><span class="flag" data-id="5">Finally moved in! Villa 24, Street 7 😍</span></div>
+        <div class="post"><span class="ph">✈️</span><span class="flag" data-id="6">Flying to London tomorrow for 3 weeks!! [photo of boarding pass]</span></div>
+        <div class="post"><span class="ph">🏡</span><span class="flag" data-id="7">Home alone till 9pm today 😎🎮</span></div>
+        <div class="post"><span class="ph">🐶</span>Meet <span class="flag" data-id="8">Coco 🐶 (also my password lol 😂)</span></div>
+        <div class="post"><span class="ph">📍</span><span class="flag" data-id="9">Live location sharing: ON with all followers</span></div>
+      </div>
+    </div>
+    <div class="panel" style="margin:0">
+      <p class="counter" id="leakCount"></p>
+      <ul class="foundlist" id="leakList"></ul>
+      <button class="btn ghost" onclick="revealLeaks()">🔍 Reveal all leaks</button>
+    </div>
+  </div>
+</section>
+
+<!-- 6. WHAT WOULD YOU DO -->
+<section class="screen" id="s-quiz" data-name="What Would You Do?">
+  <span class="tag">MISSION 06</span>
+  <h2>🎯 What Would You Do?</h2>
+  <p class="lead">Tougher, real-world situations. There may be more than one okay option, but only one is the <b>best</b> action. Discuss in pairs before you choose.</p>
+  <div class="panel" id="quizBox"></div>
+</section>
+
+<!-- 7. FACT OR FAKE -->
+<section class="screen" id="s-fact" data-name="Fact or Fake?">
+  <span class="tag">MISSION 07</span>
+  <h2>📰 Fact, Fake or Check First?</h2>
+  <p class="lead">Fake news and AI-made images spread faster than real news. Before you believe or forward something, decide how to treat it. (+5 XP each)</p>
+  <div class="panel">
+    <h3>🔎 The S.I.F.T. Method</h3>
+    <div class="sift">
+      <div><b>S</b><b style="font-size:1rem;display:inline;color:var(--ink)">Stop</b>: don't react or forward straight away.</div>
+      <div><b>I</b><b style="font-size:1rem;display:inline;color:var(--ink)">Investigate the source</b>: who posted it? Is it an official account?</div>
+      <div><b>F</b><b style="font-size:1rem;display:inline;color:var(--ink)">Find better coverage</b>: are trusted news sites reporting it?</div>
+      <div><b>T</b><b style="font-size:1rem;display:inline;color:var(--ink)">Trace to the original</b>: where did the photo or quote first appear?</div>
+    </div>
+  </div>
+  <div class="panel" id="factBox"></div>
+</section>
+
+<!-- 8. PLEDGE -->
+<section class="screen" id="s-pledge" data-name="Defender Pledge">
+  <span class="tag">FINAL MISSION</span>
+  <h2>🏅 The Cyber Defender Pledge</h2>
+  <p class="lead">A true Cyber Defender protects themselves <b>and</b> others. Tick every promise, enter your agent name, and claim your badge.</p>
+  <div class="panel pledge" id="pledgeList"></div>
+  <div class="panel">
+    <label for="gname"><b>Agent name:</b></label>
+    <input class="namein" id="gname" placeholder="Type your first name" maxlength="30">
+    <div style="margin-top:14px"><button class="btn" onclick="makeBadge()">🏅 Claim my badge</button></div>
+    <p id="pledgeMsg" style="color:var(--red)"></p>
+  </div>
+  <div id="badge">
+    <div class="medal">🛡️⚡</div>
+    <div class="rank">GRADE 7 · CERTIFIED</div>
+    <h1 style="margin:.1em 0">Cyber Defender</h1>
+    <div class="nm" id="bname"></div>
+    <p id="binfo" style="color:var(--muted)"></p>
+    <p><b>Pause · Verify · Protect · Report</b></p>
+    <button class="btn ghost" onclick="window.print()">🖨️ Print badge</button>
+  </div>
+</section>
+
+</main>
+
+<div class="bottomnav">
+  <div class="in">
+    <button class="btn ghost" id="prevBtn" onclick="go(cur-1)">⬅ Back</button>
+    <div class="stepname" id="stepname"></div>
+    <button class="btn" id="nextBtn" onclick="go(cur+1)">Next ➡</button>
+  </div>
+</div>
+
+<script>
+/* ================= CORE ================= */
+let xp = 0, cur = 0;
+const screens = [...document.querySelectorAll('.screen')];
+const visited = new Set();
+const $ = id => document.getElementById(id);
+function addXP(n, msg){
+  xp += n;
+  const p = $('points'); p.textContent = 'XP ' + xp;
+  p.classList.remove('bump'); void p.offsetWidth; p.classList.add('bump');
+  if(msg) toast(msg);
+}
+function toast(t){
+  const el = $('toast'); el.textContent = t; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove('show'),1500);
+}
+const nav = $('nav');
+screens.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.textContent = (i+1) + '. ' + s.dataset.name;
+  b.onclick = ()=>go(i);
+  nav.appendChild(b);
+});
+function go(i){
+  if(i<0 || i>=screens.length) return;
+  cur = i; visited.add(i);
+  screens.forEach((s,j)=>s.classList.toggle('active', j===i));
+  [...nav.children].forEach((b,j)=>{b.classList.toggle('active', j===i); b.classList.toggle('done', visited.has(j));});
+  nav.children[i].scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+  $('progbar').style.width = ((i+1)/screens.length*100)+'%';
+  $('stepname').textContent = 'MISSION ' + (i+1) + '/' + screens.length + ' · ' + screens[i].dataset.name;
+  $('prevBtn').disabled = i===0;
+  $('nextBtn').disabled = i===screens.length-1;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ================= 1. TERMINAL + MIND TRICKS ================= */
+const termLines = [
+  '<span class="c">&gt; cyber_guardian --start</span>',
+  '[✓] Loading training missions',
+  '[✓] Agent access granted',
+  '[!] New threats detected: 10',
+  '[!] AI deepfakes: active',
+  '[!] Social engineering: active',
+  '<span class="c">&gt; Begin training? Y</span>'
+];
+(function typeTerm(){
+  let i = 0; const t = $('term');
+  (function next(){ if(i<termLines.length){ t.innerHTML += termLines[i++] + '\n'; setTimeout(next, 450);} })();
+})();
+
+const triggers = [["⏰","Urgency"],["👮","Authority"],["🎁","Reward"],["👀","Curiosity"],["😨","Fear"],["🤝","Trust"]];
+const tricks = [
+  {from:"SMS · Unknown number", m:"Your Instagram will be PERMANENTLY deleted in 1 hour. Verify now: insta-verify.co", a:"Urgency", why:"“1 hour” and “NOW” rush you so you don't stop to think."},
+  {from:"Email · it-support@schoolhelpdesk.net", m:"This is the School IT Department. Reply with your portal username and password to keep your account active.", a:"Authority", why:"Pretending to be someone in charge (school, police, a bank) makes you obey without checking. Real IT staff never ask for your password."},
+  {from:"DM · @giveaway_official_2026", m:"🎉 You've been selected to win a PS5 and AED 2,000! Just pay AED 15 delivery to claim.", a:"Reward", why:"A big prize makes you excited and less careful. If you never entered, you didn't win."},
+  {from:"DM · @anon_secrets", m:"OMG someone posted an embarrassing video of you 😳 watch before it's deleted 👉 link", a:"Curiosity", why:"You NEED to know, so you click. The link usually steals your login or installs malware."},
+  {from:"Pop-up · Website", m:"⚠️ WARNING! Your phone is infected and your photos will be leaked! Download CleanerPro now!", a:"Fear", why:"Panic switches off careful thinking. Real security warnings don't flash on random websites."},
+  {from:"WhatsApp · New number", m:"Hey! It's Sara from your class, new number 😊 Can you send me the code that just came to your phone?", a:"Trust", why:"Pretending to be a friend makes you lower your guard. That code would let them take over YOUR WhatsApp."}
+];
+let ti = 0, tOk = 0;
+function renderTrick(){
+  const box = $('trickBox');
+  if(ti>=tricks.length){
+    box.innerHTML = `<div class="result"><div class="big">🧠</div><h3>${tOk} / ${tricks.length} mind tricks spotted!</h3>
+      <p class="lead">Remember: when a message makes you feel <b>rushed, scared, excited or curious</b>, that's your signal to <b>PAUSE</b>.</p>
+      <button class="btn ghost" onclick="ti=0;tOk=0;renderTrick()">🔁 Try again</button></div>`;
+    return;
+  }
+  const t = tricks[ti];
+  box.innerHTML = `<p class="mono" style="color:var(--muted);font-size:.85rem">MESSAGE ${ti+1} / ${tricks.length}</p>
+    <div class="msgcard"><small>${t.from}</small>${t.m}</div>
+    <div class="trig">${triggers.map(g=>`<button data-t="${g[1]}" onclick="pickTrick('${g[1]}')"><span>${g[0]}</span>${g[1]}</button>`).join('')}</div>
+    <div class="feedback" id="tfb"></div>`;
+}
+function pickTrick(g){
+  const t = tricks[ti], ok = g===t.a;
+  document.querySelectorAll('.trig button').forEach(b=>{b.disabled=true; if(b.dataset.t===t.a) b.classList.add('right'); else if(b.dataset.t===g) b.classList.add('wrong');});
+  if(ok){tOk++; addXP(3,'+3 XP · Trick spotted!');}
+  const fb = $('tfb'); fb.className = 'feedback show ' + (ok?'best':'bad');
+  fb.innerHTML = `<h3>${ok?'✅ Correct!':'❌ It was: '+t.a}</h3><p>${t.why}</p><button class="btn" onclick="ti++;renderTrick()">Next ➡</button>`;
+}
+renderTrick();
+
+/* ================= 2. THREATS ================= */
+const threats = [
+  {i:"🎭",t:"Social Engineering",s:"Hacking people instead of computers",lv:"VERY COMMON",c:"var(--red)",
+   w:"Attackers pretend to be a friend, teacher, gaming moderator or company to trick you into giving passwords, codes or money.",
+   f:"Pressure, secrecy, unusual requests, “just this once”.",
+   d:"Pause and verify using a different way, like calling them on a saved number. Never share codes."},
+  {i:"🔐",t:"Online Blackmail",s:"“Do what I say or I'll share your secrets”",lv:"SERIOUS",c:"var(--red)",
+   w:"A fake account (often pretending to be a teen) builds trust, collects your private chats, pictures or personal details, then threatens to share them unless you pay money or do what they say. These are often organised criminal gangs.",
+   f:"A new online “friend” who gets close very fast, asks for pictures or secrets, or wants to move to a private app.",
+   d:"Never pay or send more. Stop replying, but don't delete anything. Screenshot, block, report, and tell a trusted adult immediately. It is NOT your fault, and adults can get the content removed."},
+  {i:"🤖",t:"Deepfakes & AI Fakes",s:"Fake faces, voices and photos",lv:"RISING FAST",c:"var(--orange)",
+   w:"AI apps can put anyone's face on a video or copy their voice. They are used for scams, fake celebrity giveaways, and to bully classmates with fake edited pictures.",
+   f:"Odd blinking, blurry edges, strange hands, voice that sounds “flat”, shocking content.",
+   d:"Never create or share AI fakes of real people. That is harmful and illegal. Verify shocking videos with official sources."},
+  {i:"💧",t:"Data Breaches",s:"When a company's data is leaked",lv:"COMMON",c:"var(--orange)",
+   w:"Hackers break into a website and steal usernames, emails and passwords. Then they try them everywhere (credential stuffing).",
+   f:"An email saying “unusual login”, password reset you didn't request.",
+   d:"Use unique passwords, turn on 2FA, change your password quickly if a site is breached."},
+  {i:"📶",t:"Public Wi-Fi Traps",s:"Free Wi-Fi isn't always friendly",lv:"COMMON",c:"var(--yellow)",
+   w:"Hackers can create fake hotspots like “Free_Mall_WiFi” to watch what you do or show fake login pages.",
+   f:"Wi-Fi with no password, or that asks you to log in with your social media account.",
+   d:"Avoid logging into accounts on public Wi-Fi. Use mobile data or a family hotspot instead."},
+  {i:"📱",t:"Sneaky App Permissions",s:"Apps that want too much",lv:"HIDDEN",c:"var(--yellow)",
+   w:"Some free apps ask for your contacts, microphone, camera and location even when they don't need them, and then sell or misuse that data.",
+   f:"A flashlight or game app that wants your contacts or location “always”.",
+   d:"Only allow what the app truly needs. Check permissions in Settings. Delete apps you don't use."},
+  {i:"🎮",t:"Gaming & Discord Scams",s:"Free skins, Nitro, item trades",lv:"VERY COMMON",c:"var(--red)",
+   w:"Fake “free Nitro / free skins” links, fake trading sites, and “scan this QR code to log in” tricks steal whole gaming accounts.",
+   f:"Gifts from strangers, trades outside the official game, QR code logins.",
+   d:"Only trade inside the official game. Never scan a login QR code someone sends you."},
+  {i:"🧭",t:"Doxxing",s:"Exposing someone's personal details",lv:"SERIOUS",c:"var(--red)",
+   w:"Someone collects and posts your real name, school, address or phone number, often after an online argument, to scare or embarrass you.",
+   f:"“I know where you live”, your school or area being mentioned by strangers.",
+   d:"Keep personal info off profiles. Don't reply. Screenshot, report, and tell an adult right away."},
+  {i:"💸",t:"“Easy Money” Scams",s:"Too-good-to-be-true offers",lv:"GROWING",c:"var(--orange)",
+   w:"Offers like “earn AED 500 a day”, crypto doubling, or “just receive money in your account and send it on”. The last one makes you a money mule, which is a crime.",
+   f:"Quick money, no real work, “keep it secret”, asks for bank or card details.",
+   d:"Never let anyone use your (or your parents') account or card. Tell an adult."},
+  {i:"⚡",t:"Dangerous Viral Challenges",s:"Trends that hurt people",lv:"WATCH OUT",c:"var(--yellow)",
+   w:"Some online challenges dare people to do risky or harmful things and film it for likes. Some are fake scare stories designed to frighten kids.",
+   f:"“Everyone's doing it”, dares that involve risk, pain, or embarrassing others.",
+   d:"Don't try it, don't share it. Report it and talk to an adult. Likes are not worth your safety."}
+];
+const opened = new Set();
+$('threats').innerHTML = threats.map((t,i)=>`
+  <button class="tcard" onclick="flip(this,${i})">
+    <div class="front"><div class="ico">${t.i}</div><h3>${t.t}</h3><p>${t.s}</p>
+      <span class="lvlpill" style="background:${t.c};color:#111">${t.lv}</span><span class="tapme">&gt; tap to open file</span></div>
+    <div class="back"><h3>${t.i} ${t.t}</h3>
+      <p><b>How it works:</b> ${t.w}</p>
+      <p><b>🚩 Warning signs:</b> ${t.f}</p>
+      <p><b style="color:var(--green)">🛡️ Defence:</b> ${t.d}</p></div>
+  </button>`).join('');
+function updT(){ $('tcount').textContent = 'FILES OPENED: ' + opened.size + ' / ' + threats.length; }
+function flip(el,i){
+  el.classList.toggle('open');
+  if(!opened.has(i)){ opened.add(i); addXP(2,'+2 XP · File opened'); updT(); }
+}
+updT();
+
+/* ================= 3. LINK DETECTIVE ================= */
+const links = [
+  {u:"https://www.instagram.com/accounts/login", d:"instagram.com", ok:true, why:"The real domain is instagram.com. This is the genuine login page."},
+  {u:"https://instagram-verify-badge.com/login", d:"instagram-verify-badge.com", ok:false, why:"The real domain is instagram-verify-badge.com, NOT instagram.com. Anyone can buy a name like this."},
+  {u:"https://www.roblox.com.free-robux.xyz/claim", d:"free-robux.xyz", ok:false, why:"Read right to left! The real domain is free-robux.xyz. “roblox.com” is just a disguise at the front."},
+  {u:"https://accounts.google.com/signin", d:"google.com", ok:true, why:"accounts.google.com belongs to google.com. Safe."},
+  {u:"http://paypa1.com/secure-login", d:"paypa1.com", ok:false, why:"“paypa1” uses the number 1 instead of the letter L. It also has no HTTPS. That's a double red flag."},
+  {u:"https://www.moe.gov.ae", d:"moe.gov.ae", ok:true, why:"“.gov.ae” is reserved for UAE government websites. This is the Ministry of Education."},
+  {u:"https://bit.ly/fr33-g1ft-card", d:"bit.ly", ok:false, why:"A short link hides the real destination, and “fr33 g1ft” is classic bait. Don't trust it unless it comes from someone you know AND you expected it."},
+  {u:"https://amazon.ae-order-cancel.help/refund", d:"ae-order-cancel.help", ok:false, why:"The real domain is ae-order-cancel.help. The scammer put “amazon.” in front to fool you."},
+  {u:"https://www.youtube.com/watch?v=dQ7xT2", d:"youtube.com", ok:true, why:"youtube.com is the real domain. Everything after the / is just the video's address."},
+  {u:"https://discord-nitro-gifts.ru/free", d:"discord-nitro-gifts.ru", ok:false, why:"Not discord.com! Free Nitro links are one of the most common ways Discord accounts get stolen."}
+];
+let li = 0, lOk = 0;
+function renderLink(){
+  const box = $('linkBox');
+  if(li>=links.length){
+    box.innerHTML = `<div class="result"><div class="big">🔗</div><h2>${lOk} / ${links.length} correct</h2>
+      <p class="lead">Golden rule: <b>don't click links in messages</b>. Type the website yourself or use the official app.</p>
+      <button class="btn ghost" onclick="li=0;lOk=0;renderLink()">🔁 Play again</button></div>`;
+    return;
+  }
+  const L = links[li];
+  const lock = L.u.startsWith('https') ? '🔒' : '⚠️';
+  box.innerHTML = `<p class="mono" style="color:var(--muted);font-size:.85rem">LINK ${li+1} / ${links.length} · Correct: ${lOk}</p>
+    <div class="urlbox" id="url"><span class="lock">${lock}</span><span>${L.u}</span></div>
+    <div class="duo"><button class="trustbtn" onclick="pickLink(true)">✅ Trust it</button><button class="notbtn" onclick="pickLink(false)">🚫 Don't trust</button></div>
+    <div class="feedback" id="lfb"></div>`;
+}
+function pickLink(c){
+  const L = links[li], ok = c===L.ok;
+  document.querySelectorAll('.duo button').forEach(b=>b.disabled=true);
+  $('url').innerHTML = `<span class="lock">${L.u.startsWith('https')?'🔒':'⚠️'}</span><span>${L.u.replace(L.d,'<mark>'+L.d+'</mark>')}</span>`;
+  if(ok){lOk++; addXP(5,'+5 XP · Sharp eyes!');}
+  const fb = $('lfb'); fb.className = 'feedback show ' + (ok?'best':'bad');
+  fb.innerHTML = `<h3>${ok?'✅ Correct!':'❌ Not quite!'} ${L.ok?'This link is REAL.':'This link is FAKE.'}</h3>
+    <p><b>Real domain:</b> <code>${L.d}</code><br>${L.why}</p><button class="btn" onclick="li++;renderLink()">Next link ➡</button>`;
+}
+renderLink();
+
+/* ================= 4. BREACH SIMULATOR ================= */
+const accts = [["🎮","GameZone (leaked)"],["📸","Social media"],["📧","Email"],["🏫","School portal"],["🛒","Shopping app"]];
+function drawAccts(){
+  $('accts').innerHTML = accts.map((a,i)=>`<div class="acct" id="ac${i}"><div class="i">${a[0]}</div><b>${a[1]}</b><div class="st">waiting…</div></div>`).join('');
+}
+drawAccts();
+let breachRuns = new Set(), running = false;
+function runBreach(){
+  if(running) return; running = true; $('breachBtn').disabled = true;
+  drawAccts();
+  const uniq = $('uniq').checked, mfa = $('mfa').checked;
+  const log = $('blog'); log.textContent = '';
+  const L = s => { log.textContent += s + '\n'; };
+  L('> GameZone database hacked!');
+  L('> Leaked: rayan.k@email.com : ' + (uniq ? 'Gz#Tiger-88-Jump' : 'Rayan@2013'));
+  let hacked = 0;
+  accts.forEach((a,i)=>{
+    setTimeout(()=>{
+      const el = $('ac'+i), st = el.querySelector('.st');
+      const pwWorks = (i===0) || !uniq;
+      if(pwWorks && !mfa){ el.className='acct hacked'; st.textContent='🔓 HACKED'; hacked++; L('> Trying '+a[1]+'... password works. ACCESS GRANTED ❌'); }
+      else if(pwWorks && mfa){ el.className='acct safe'; st.textContent='🔒 SAFE (2FA)'; L('> Trying '+a[1]+'... password works, but 2FA code needed. BLOCKED ✅'); }
+      else { el.className='acct safe'; st.textContent='🔒 SAFE (unique pw)'; L('> Trying '+a[1]+'... wrong password. BLOCKED ✅'); }
+      if(i===accts.length-1){
+        setTimeout(()=>{
+          L('');
+          if(hacked===5) L('> RESULT: 5/5 accounts hacked. One password = one key for every door.');
+          else if(hacked>0) L('> RESULT: Only '+hacked+' account hacked. Unique passwords limited the damage! Now add 2FA.');
+          else L('> RESULT: 0 accounts hacked. Unique passwords + 2FA = FULLY PROTECTED 🛡️');
+          const key = (uniq?'u':'')+(mfa?'m':'');
+          if(!breachRuns.has(key)){ breachRuns.add(key); addXP(hacked===0?10:4, hacked===0?'+10 XP · Fully protected!':'+4 XP · Simulation run'); }
+          running = false; $('breachBtn').disabled = false;
+        },500);
+      }
+    }, 700*(i+1));
+  });
+}
+
+/* ================= 5. PROFILE LEAK HUNT ================= */
+const leaks = [
+  ["Username shows birth year (2013).","Use a nickname with no age or year."],
+  ["Public account: anyone in the world can see everything.","Switch to a private account and approve followers you know."],
+  ["School name and class: a stranger knows where to find you every day.","Remove school details from your profile."],
+  ["Home area: narrows down where you live.","Never put your area or city in your bio."],
+  ["Phone number: strangers and scammers can contact you directly.","Keep phone numbers off all profiles."],
+  ["Exact house address: your home is now public.","Never post addresses or photos showing house numbers."],
+  ["Travel dates plus boarding pass: your home will be empty for 3 weeks, and the barcode can reveal booking details.","Post trip photos after you return. Never post tickets or passes."],
+  ["“Home alone” tells strangers exactly when you are unprotected.","Never announce when you are alone."],
+  ["Password hint: the pet's name IS the password!","Never use pet names, and never joke about your passwords."],
+  ["Live location with all followers: your exact position, all the time.","Turn location sharing off, or share only with family."]
+];
+const lfound = new Set();
+document.querySelectorAll('#profile .flag').forEach(f=>f.addEventListener('click',()=>findLeak(+f.dataset.id,true)));
+function findLeak(id, award){
+  if(lfound.has(id)) return;
+  lfound.add(id);
+  document.querySelector('#profile .flag[data-id="'+id+'"]').classList.add('found');
+  if(award) addXP(5,'🚩 Leak found! +5 XP');
+  renderLeaks();
+  if(award && lfound.size===leaks.length) setTimeout(()=>toast('🏆 Profile fully secured!'),1600);
+}
+function renderLeaks(){
+  $('leakCount').textContent = 'LEAKS FOUND: ' + lfound.size + ' / ' + leaks.length;
+  $('leakList').innerHTML = [...lfound].sort((a,b)=>a-b).map(id=>`<li>🚩 ${leaks[id][0]}<br><b>Fix:</b> ${leaks[id][1]}</li>`).join('') || '<li style="border-color:var(--line)">Tap the risky details on the profile…</li>';
+}
+function revealLeaks(){ leaks.forEach((_,i)=>findLeak(i,false)); }
+renderLeaks();
+
+/* ================= 6. SCENARIO QUIZ ================= */
+const Q = [
+  {e:"🎮",l:"GAMING · DISCORD",s:"A friendly player in your Discord server sends: “Free Nitro for active members! 🎁 Just scan this QR code with your Discord app to claim.”",
+   o:[["Scan it. It's free Nitro and they're in my server.","bad","Scanning a login QR code logs THEM into YOUR account. It's one of the fastest ways Discord accounts are stolen."],
+      ["Don't scan. Report the message to server mods and block the user.","best","Exactly. Real gifts never need a QR login. Reporting protects the whole server."],
+      ["Ask in the server chat if anyone else got it.","okay","Warning others is kind, but don't interact with the scam. Report it to the mods so they can remove it."],
+      ["Scan it with a friend's phone instead.","bad","That just steals your friend's account instead."]]},
+  {e:"😰",l:"BLACKMAIL",s:"Someone you met online and chatted with for weeks suddenly says: “I saved all our private chats and pictures. Send AED 200 in gift cards or I'll share them with your school group.”",
+   o:[["Pay quickly so it goes away.","bad","Paying almost never ends it. Blackmailers usually ask for more. Never pay."],
+      ["Delete your account and all chats and try to forget it.","okay","Stepping away is understandable, but deleting removes the evidence adults and police need to stop this person."],
+      ["Stop replying, don't pay, screenshot everything, block and report, and tell a trusted adult right now.","best","This is the right move, and it takes courage. You are NOT in trouble and it is NOT your fault. Adults can help report this and get images removed."],
+      ["Threaten them back.","bad","This keeps the conversation going and gives them more power. Stop all contact."]]},
+  {e:"🤖",l:"AI FAKES",s:"An AI-edited photo of a classmate doing something embarrassing is going around your class group. It's obviously fake, but people are laughing.",
+   o:[["It's fake, so it's harmless. Just laugh along.","bad","Fake or not, it humiliates a real person. Creating or sharing it is cyberbullying and can be a crime in the UAE."],
+      ["Don't share it. Report it, support your classmate, and tell a teacher.","best","Upstander move! Adults can get it removed and stop it spreading."],
+      ["Save it in case you need it later.","bad","Keeping copies can spread it further. Only adults handling the report need evidence."],
+      ["Leave the group quietly.","okay","Better than joining in, but your classmate still needs help. Tell a teacher."]]},
+  {e:"📶",l:"PUBLIC WI-FI",s:"At the mall you connect to “FREE_MALL_WIFI_5G”. A page pops up: “Log in with your Instagram or Google account to get internet.”",
+   o:[["Log in with Instagram. It's quicker.","bad","Fake hotspots use pages like this to steal logins. You just handed over your account."],
+      ["Disconnect, and use mobile data or a parent's hotspot instead.","best","Smart. Never type passwords into pop-up Wi-Fi pages, especially social media ones."],
+      ["Log in with Google instead of Instagram.","bad","Same trap, different account."],
+      ["Use it, but only to browse, without logging into anything.","okay","Less risky, but fake hotspots can still show fake pages. Mobile data is safer."]]},
+  {e:"💧",l:"DATA BREACH",s:"You get a real email from a game company: “We had a security incident. Some user passwords may have been exposed.” You use the same password on 3 other apps.",
+   o:[["Ignore it. Nobody wants my account.","bad","Hackers use automated tools that try millions of leaked passwords. Everyone is a target."],
+      ["Change only the game password.","okay","Good start, but your other 3 accounts use the same password, and they're now at risk too."],
+      ["With a parent, change the password on ALL accounts that used it (make each one unique) and turn on 2FA.","best","Perfect response, just like the Breach Simulator showed."],
+      ["Click the link in the email to reset quickly.","okay","Even real-looking emails can be fakes. Open the app or website yourself to reset."]]},
+  {e:"🗣️",l:"RUMOURS",s:"A message in your group says a teacher has been “fired for cheating”, with a screenshot. No one knows where it came from. People ask you to forward it.",
+   o:[["Forward it. Everyone should know.","bad","Spreading unverified claims damages a real person's reputation. In the UAE, spreading rumours online is against the law."],
+      ["Don't forward it. Say “we don't know if this is true”, and let a trusted adult know.","best","S.I.F.T. in action. Stopping a rumour protects people."],
+      ["Forward it, but add “not sure if true”.","bad","It still spreads the rumour, and the disclaimer gets ignored."],
+      ["Ignore it.","okay","Not spreading it is good. Speaking up or telling an adult is even better."]]},
+  {e:"📱",l:"APP PERMISSIONS",s:"You install a free photo-filter app. It asks for: Contacts, Microphone, Location (always), Camera, Photos.",
+   o:[["Allow all. Otherwise it might not work.","bad","A filter app doesn't need your contacts, microphone or location. Those can be collected and sold."],
+      ["Allow only Camera and Photos, deny the rest, and check the app's reviews with a parent.","best","Defender thinking: give only the permissions the app truly needs."],
+      ["Deny everything.","okay","Safe, but the app won't work. Better to choose the permissions that make sense."],
+      ["Allow all now and change it later.","bad","Once data is collected, you can't take it back."]]},
+  {e:"💸",l:"EASY MONEY",s:"An Instagram account offers: “Earn AED 500 in 10 minutes! We send money to your (or your parent's) bank account, you send it to our partner and keep AED 500.”",
+   o:[["Do it. It's quick money.","bad","This is a money mule scam. That money is usually stolen, and the person whose account is used can get into serious legal trouble."],
+      ["Ask them for more details first.","okay","Asking questions keeps you talking to criminals. Just block and report."],
+      ["Refuse, block, report the account, and tell your parents.","best","Correct. Never let anyone use your or your family's account or card."],
+      ["Try it once with a small amount.","bad","Even once makes you part of a crime."]]},
+  {e:"🧭",l:"DOXXING",s:"After an argument in an online game, a player posts your real name and school in the chat and writes “see you tomorrow 😈”.",
+   o:[["Post their details back.","bad","Revenge doxxing makes things worse and can get you in trouble too."],
+      ["Leave the game and don't tell anyone.","bad","This is a safety threat. Adults need to know right away."],
+      ["Don't reply. Screenshot, report, block, tell a parent and your school, then lock down your profile.","best","Correct. Threats are serious, and school and parents can take action to keep you safe."],
+      ["Reply “I'm not scared”.","okay","Brave, but it keeps the argument going. Report and get help instead."]]},
+  {e:"📦",l:"SMISHING",s:"SMS: “Your parcel is on hold at customs. Pay AED 7.50 fee within 24 hrs or it will be returned: ae-post-fee.com”.",
+   o:[["It's only AED 7.50. Pay it with a parent's card.","bad","The fee is tiny so you don't think twice. The real goal is to steal the full card details."],
+      ["Don't click. Show a parent, and check any delivery only through the official courier app or website.","best","Correct. Fake delivery SMS are among the most common scams in the UAE."],
+      ["Reply STOP to unsubscribe.","okay","Replying tells scammers your number is active. Just delete and report."],
+      ["Forward it to friends to warn them.","okay","Kind idea, but people might click the link. Warn them without forwarding the link."]]},
+  {e:"🔓",l:"HACKED ACCOUNT",s:"Your friends message you: “Why are you asking us for money?” Your account has been hacked, and the hacker is messaging all your contacts.",
+   o:[["Make a new account and forget the old one.","okay","The hacker still controls the old account and can keep scamming your friends. Try to recover it."],
+      ["Tell a parent right away, use the app's official “hacked account” recovery, warn friends, then turn on 2FA.","best","Perfect. Fast action limits the damage, and 2FA stops it from happening again."],
+      ["Message the hacker and ask for the account back.","bad","They won't give it back, and may try to blackmail you."],
+      ["Do nothing. Friends will figure it out.","bad","Some friends may send money before they realise. Warn them now."]]},
+  {e:"⚡",l:"VIRAL CHALLENGE",s:"A new challenge is trending: people film themselves doing a risky stunt. Your friends dare you and say you'll get thousands of views.",
+   o:[["Do it. Views are views!","bad","Many people have been badly hurt doing viral challenges. No video is worth your safety."],
+      ["Say no, don't share the challenge videos, and report them.","best","Strong choice. Real friends respect a “no”."],
+      ["Film someone else doing it instead.","bad","Encouraging someone else into danger, and posting it, is still harmful."],
+      ["Just watch the videos but don't do it.","okay","Not taking part is good, but watching and sharing helps it trend. Report it instead."]]}
+];
+let qi = 0, qXP = 0, qBest = 0;
+function renderQ(){
+  const box = $('quizBox');
+  if(qi>=Q.length){
+    const rank = qBest>=11?["🏆","Elite Cyber Defender"]:qBest>=8?["🛡️","Cyber Defender"]:["🌱","Defender in Training"];
+    box.innerHTML = `<div class="result"><div class="big">${rank[0]}</div><h2>${rank[1]}</h2>
+      <p class="lead">You chose the BEST action in <b style="color:var(--yellow)">${qBest} of ${Q.length}</b> situations (+${qXP} XP).</p>
+      <button class="btn ghost" onclick="qi=0;qXP=0;qBest=0;renderQ()">🔁 Play again</button>
+      <button class="btn" onclick="go(cur+1)">Next mission ➡</button></div>`;
+    return;
+  }
+  const q = Q[qi];
+  box.innerHTML = `<div class="qhead"><b class="mono">SCENARIO ${qi+1}/${Q.length}</b><span class="mono">✅ BEST: ${qBest}</span></div>
+    <div class="qbar"><div style="width:${qi/Q.length*100}%"></div></div>
+    <div class="scene"><span class="emo">${q.e}</span><span class="lbl">${q.l}</span>${q.s}</div>
+    <div class="opts">${q.o.map((o,j)=>`<button class="opt" onclick="answer(${j})"><span class="letter">${'ABCD'[j]}</span><span>${o[0]}</span></button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+}
+function answer(j){
+  const q = Q[qi], type = q.o[j][1], why = q.o[j][2];
+  const btns = document.querySelectorAll('.opt');
+  btns.forEach((b,k)=>{ b.disabled = true; if(q.o[k][1]==='best') b.classList.add('best'); });
+  btns[j].classList.add(type);
+  const label = type==='best' ? '🌟 Best action! +10 XP' : type==='okay' ? '🤔 Okay, but there is a better move. +3 XP' : '🚨 Risky choice!';
+  if(type==='best'){ qXP+=10; qBest++; addXP(10); } else if(type==='okay'){ qXP+=3; addXP(3); }
+  const best = q.o.find(o=>o[1]==='best');
+  const fb = $('fb'); fb.className = 'feedback show ' + type;
+  fb.innerHTML = `<h3>${label}</h3><p>${why}</p>${type!=='best'?`<p><b style="color:var(--green)">🛡️ Best action:</b> ${best[0]}</p>`:''}
+    <button class="btn" onclick="qi++;renderQ()">${qi===Q.length-1?'See my rank 🏁':'Next scenario ➡'}</button>`;
+  fb.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+renderQ();
+
+/* ================= 7. FACT OR FAKE ================= */
+const F = [
+  {src:"Forwarded many times · WhatsApp", h:"“WhatsApp will start charging AED 20 a month from Monday unless you forward this message to 10 people!”", a:"fake",
+   why:"Classic chain message. Companies announce changes on official channels, not through forwards. “Forward to 10 people” is always a red flag."},
+  {src:"Video · @CricketStarGiveaway", h:"Famous cricketer announces: “I'm gifting free laptops to 1,000 students. Register at the link and pay a small delivery fee.”", a:"fake",
+   why:"Likely a deepfake scam. Real celebrities don't ask for fees, and the account isn't official (no verified badge, odd username)."},
+  {src:"Photo · Shared on social media", h:"Shark spotted swimming on Sheikh Zayed Road after heavy rain! 🦈", a:"fake",
+   why:"A famous edited photo that gets re-shared after every storm worldwide. A reverse image search shows it's old and fake."},
+  {src:"Screenshot of a news headline", h:"“All UAE school exams cancelled next week”", a:"check",
+   why:"Screenshots are easy to fake. Check the Ministry of Education or your school's official channel before believing or sharing it."},
+  {src:"nasa.gov · Official website", h:"NASA releases new images of a distant galaxy taken by its space telescope.", a:"real",
+   why:"An official .gov source posting about its own work is reliable. That's “Investigate the source” in action."},
+  {src:"Forwarded · Health tips group", h:"“Drinking hot water every hour kills all viruses in your body. Doctors don't want you to know!”", a:"fake",
+   why:"Health misinformation. “Doctors don't want you to know” is a warning sign. Trust real health authorities."},
+  {src:"Instagram · Friend's story", h:"“A new AI app can see anyone's deleted messages! Download from this link 👇”", a:"fake",
+   why:"No app can see someone else's deleted messages. Links like this usually install malware or steal accounts."}
+];
+let fi = 0, fOk = 0;
+function renderF(){
+  const box = $('factBox');
+  if(fi>=F.length){
+    box.innerHTML = `<div class="result"><div class="big">📰</div><h2>${fOk} / ${F.length} correct</h2>
+      <p class="lead">When in doubt, <b>don't share it out</b>. Spreading false news can hurt people, and in the UAE it is against the law.</p>
+      <button class="btn ghost" onclick="fi=0;fOk=0;renderF()">🔁 Play again</button></div>`;
+    return;
+  }
+  const f = F[fi];
+  box.innerHTML = `<p class="mono" style="color:var(--muted);font-size:.85rem">ITEM ${fi+1} / ${F.length} · Correct: ${fOk}</p>
+    <div class="headline"><div class="src">${f.src}</div><div class="hl">${f.h}</div></div>
+    <div class="tri">
+      <button style="background:var(--green);color:#063" onclick="pickF('real')">🟢 Likely REAL</button>
+      <button style="background:var(--red);color:#fff" onclick="pickF('fake')">🔴 Likely FAKE</button>
+      <button style="background:var(--yellow);color:#222" onclick="pickF('check')">🟡 CHECK FIRST</button>
+    </div><div class="feedback" id="ffb"></div>`;
+}
+function pickF(c){
+  const f = F[fi];
+  document.querySelectorAll('.tri button').forEach(b=>b.disabled=true);
+  let cls, head;
+  if(c===f.a){ cls='best'; head='✅ Correct! +5 XP'; fOk++; addXP(5); }
+  else if(c==='check'){ cls='okay'; head='🟡 Checking is always smart (+2 XP), but this one has clear clues.'; addXP(2); }
+  else { cls='bad'; head='❌ Not quite.'; }
+  const ans = {real:'Likely REAL',fake:'Likely FAKE',check:'CHECK FIRST'}[f.a];
+  const fb = $('ffb'); fb.className = 'feedback show ' + cls;
+  fb.innerHTML = `<h3>${head}</h3><p><b>Answer: ${ans}.</b> ${f.why}</p><button class="btn" onclick="fi++;renderF()">Next ➡</button>`;
+}
+renderF();
+
+/* ================= 8. PLEDGE ================= */
+const P = [
+  "I will PAUSE when a message makes me feel rushed, scared, excited or curious.",
+  "I will check the real domain before I click a link or log in.",
+  "I will use unique passphrases, turn on 2FA, and never share codes or OTPs.",
+  "I will keep my profile private and never post my school, address, location or travel plans.",
+  "I will never create, share or forward fake images, rumours or embarrassing content about anyone.",
+  "I will never pay or obey anyone who threatens me online. I will report it and tell a trusted adult.",
+  "I will be an upstander: I'll support people who are targeted and help my friends stay safe."
+];
+$('pledgeList').innerHTML = P.map(p=>`<label><input type="checkbox" class="pl"><span>${p}</span></label>`).join('');
+let badgeDone = false;
+function makeBadge(){
+  const all = [...document.querySelectorAll('.pl')].every(c=>c.checked);
+  const name = $('gname').value.trim();
+  const msg = $('pledgeMsg');
+  if(!all){ msg.textContent = '☝️ Tick all ' + P.length + ' promises to claim your badge.'; return; }
+  if(!name){ msg.textContent = '☝️ Enter your agent name first.'; return; }
+  msg.textContent = '';
+  if(!badgeDone){ badgeDone = true; addXP(25,'🏅 Pledge complete! +25 XP'); }
+  $('bname').textContent = name;
+  $('binfo').textContent = 'Grade 7 · ' + xp + ' XP earned · ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const b = $('badge'); b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+  b.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+go(0);
+</script>
+</body>
+</html>
